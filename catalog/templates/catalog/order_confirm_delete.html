@@ -1,0 +1,36 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>刪除訂單</h1>
+
+    <b>目前訂單</b><br>
+    <p><strong>訂購人:</strong> {{ object.buyer }}</p>
+    <p><strong>電話:</strong> {{ object.phone }}</p>
+    <p><strong>總金額:</strong> {{ object.total_cost }}</p>
+    <p><strong>購買日期:</strong> {{ object.buytime }}</p>
+
+    <table class="ordertable">
+        <tr>
+            <th>品項</th>
+            <th>數量</th>
+            <th>單一金額</th>
+        </tr>
+        {% for item in order.orderitem_set.all %}
+        <tr>
+            <td>{{ item.product }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.cost }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+<p>確定要刪除嗎?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" action="" value="Yes, delete.">
+</form>
+
+{% endblock %}

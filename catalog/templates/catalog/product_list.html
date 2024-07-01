@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>"  "品項種類列表</h1>
+  {% if product_list %}
+    <ul>
+      {% for product in product_list %}
+      <li>
+        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+        ({{product.cost}}元)
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>目前無"  "品項</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>訂單列表</h1>
+  <a href="{% url 'neworder' %}?next={{ request.get_full_path }}">新增訂單</a>
+  {% if order_list %}
+    <table class="ordertable">
+      <tr>
+        <th>訂購人</th>
+        <th>手機</th>
+        {% comment %}
+        {% for product in product_list %}
+        <th>{{ product.name }}</th>
+        {% endfor %}
+        {% endcomment %}
+        <th>總金額</th>
+        <th>購買日期</th>
+        <th>詳細</th>
+        <th>修改訂單</th>
+        <th>刪除訂單</th>
+      </tr>
+      {% for order in order_list %}
+      <tr>
+        <td>{{ order.buyer }}</td>
+        <td>{{ order.phone }}</td>
+        {% comment %}
+        {% for product in product_list %}
+            {% for item in order.orderitem_set.all %}
+                {% if item.product == product %}
+                <td>{{ item.quantity }}</td>
+                {% else %}
+                <td>0</td>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        {% endcomment %}
+        <td>{{ order.total_cost }}</td>
+        <td>{{ order.buytime }}</td>
+        <td><a href="{% url 'order_detail' order.uuid %}">詳細</a></td>
+        <td><a href="{% url 'updateorder_staff' order.uuid %}?next={{ request.get_full_path }}">修改</a></td>
+        <td><a href="{% url 'deleteorder_staff' order.uuid %}">刪除</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>目前無訂單</p>
+  {% endif %}
+{% endblock %}
+
+
+{% comment %}
+{% for order in object_list %}
+    <h2>訂單編號: {{ order.id }}</h2>
+    <p>購買人: {{ order.buyer }}</p>
+    <p>電話: {{ order.phone }}</p>
+    <p>總金額: {{ order.total_amount }}</p>
+    <p>購買日期: {{ order.purchase_date }}</p>
+
+    <h3>訂單項目:</h3>
+    {% for item in order.orderitem_set.all %}
+        <p>商品名稱: {{ item.product.name }}</p>
+        <p>商品簡述: {{ item.product.description }}</p>
+        <p>商品價格: {{ item.product.price }}</p>
+        <p>購買數量: {{ item.quantity }}</p>
+    {% endfor %}
+{% endfor %}
+{% endcomment %}

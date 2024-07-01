@@ -1,0 +1,111 @@
+如果你希望一次處理多個 OrderItem，並且讓表單涵蓋所有的 Product，你可以使用 Django 的 formset 功能來實現。formset 可以讓你在一個表單中管理一組相同類型的表單。
+
+以下是一個範例：
+
+from django.forms import formset_factory, ModelForm
+from .models import Order, Product, OrderItem
+
+class OrderForm(ModelForm):
+    class Meta:
+        model = Order
+        fields = ['customer_name', 'customer_phone']
+
+class OrderItemForm(ModelForm):
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'quantity']
+
+OrderItemFormSet = formset_factory(OrderItemForm, extra=1)
+
+
+
+def neworder(request):
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+        order_item_formset = OrderItemFormSet(request.POST, prefix='items')
+
+        if order_form.is_valid() and order_item_formset.is_valid():
+            order = order_form.save()
+            for item_form in order_item_formset:
+                item = item_form.save(commit=False)
+                item.order = order
+                item.save()
+            return redirect('index')
+
+    else:
+        order_form = OrderForm()
+        order_item_formset = OrderItemFormSet(prefix='items')
+
+    context = {
+        'order_form': order_form,
+        'order_item_formset': order_item_formset,
+    }
+
+    return render(request, 'catalog/neworder.html', context)
+
+在這個範例中，我們首先創建了一個 OrderItemFormSet，它是一個 OrderItemForm 的集合。然後，在視圖函數中，我們同時處理 OrderForm 和 OrderItemFormSet。如果兩者都有效，我們就保存 OrderForm 來創建一個新的 Order 對象，然後遍歷 OrderItemFormSet 中的每一個表單，保存每一個 OrderItem 對象，並將其與剛剛創建的 Order 對象關聯起來。
+
+在模板中，你可以像這樣渲染 OrderItemFormSet：
+
+<form method="post">
+    {{ order_form.as_p }}
+    {{ order_item_formset.management_form }}
+    {% for item_form in order_item_formset %}
+        {{ item_form.as_p }}
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
+
+請注意，你需要包含 {{ order_item_formset.management_form }}，這是一個隱藏的表單，用於管理 formset 中的表單數量。
+
+
+
+
+
+
+如果你想要在表單中列出所有的 Product 並且為每一個都提供一個 quantity 的選擇欄位，你可以使用 Django 的 formset 功能來實現。你可以為每一個 Product 創建一個 OrderItemForm，並將它們組合成一個 formset。以下是一個範例：
+
+首先，在 forms.py 中定義你的表單：
+
+from django import forms
+from .models import Product
+
+class OrderItemForm(forms.ModelForm):
+    quantity = forms.IntegerField(min_value=0)
+
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price']
+
+
+然後，在 views.py 中創建你的視圖：
+
+from django.shortcuts import render
+from .forms import OrderItemForm
+from .models import Product
+
+def neworder(request):
+    ProductFormSet = forms.formset_factory(OrderItemForm, extra=0)
+    if request.method == 'POST':
+        formset = ProductFormSet(request.POST, prefix='products')
+        if formset.is_valid():
+            # 在這裡處理你的數據
+            pass
+    else:
+        products = Product.objects.all()
+        formset = ProductFormSet(initial=[{'name': p.name, 'description': p.description, 'price': p.price} for p in products], prefix='products')
+
+    return render(request, 'neworder.html', {'formset': formset})
+
+最後，在你的模板中渲染你的 formset：
+
+<form method="post">
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form.id }}
+        {{ form.name }}: {{ form.quantity }}
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
+
+這樣，你的表單就會列出所有的 Product，並且每一個都有一個 quantity 的選擇欄位。希望這對你有所幫助！

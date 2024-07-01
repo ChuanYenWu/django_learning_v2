@@ -1,0 +1,34 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>訂購歷史結果</h1>
+  {% if page_obj %}
+    <table class="ordertable">
+      <tr>
+        <th>訂購人</th>
+        <th>手機</th>
+        <th>總金額</th>
+        <th>購買日期</th>
+        <th>詳細</th>
+        <th>修改訂單</th>
+      </tr>
+      {% for order in page_obj %}
+      <tr>
+        <td>{{ order.buyer }}</td>
+        <td>{{ order.phone }}</td>
+        <td>{{ order.total_cost }}</td>
+        <td>{{ order.buytime }}</td>
+        <td><a href="{% url 'order_detail' order.uuid %}">詳細</a></td>
+        {% if order.intime %}
+          <td><a href="{% url 'updateorder_customer' order.uuid %}">修改</a></td>
+        {% else %}
+          <td></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>無此電話之訂單</p>
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block title %}
+    <title>訂購首頁 Main Page</title>
+{% endblock %}
+
+{% block content %}
+  <h1>訂購"  "首頁</h1>
+  <p>
+    歡迎光臨
+    <em>訂"  "</em>!
+  </p>
+  <p>目前狀態:</p>
+  <ul>
+    <li><strong>"  "種類:</strong> {{ num_product }}</li>
+    <li><strong>總訂單數:</strong> {{ num_order }}</li>
+  </ul>
+  <p>
+    您已經造訪 {{ num_visits }} 次
+  </p>
+
+  {% if user.is_staff %}
+  <h3>STAFF USING</h3>
+  {% endif %}
+{% endblock %}

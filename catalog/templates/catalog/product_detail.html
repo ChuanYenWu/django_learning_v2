@@ -1,0 +1,24 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>品項: {{ product.name }}</h1>
+
+  <p><strong>簡介:</strong> {{ object.summary }}</p>
+  <p><strong>價格:</strong> {{ object.cost }}</p>
+
+{% load static %}
+  
+{% if image_exists %}
+  {% with object.id|stringformat:'s' as stringid %}
+  <img  src= "{% static 'images/img_'|add:stringid|add:'.jpeg' %}"
+        alt="img"
+        style="width:320px;height:auto;" >
+      
+  {% endwith %}
+{% else %}
+  <p>No image</p>
+{% endif %}
+
+
+
+{% endblock %}
